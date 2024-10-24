@@ -31,7 +31,6 @@ print(' ')
 
 print(df['Credentials of the Provider'].value_counts())
 df['Credentials of the Provider'] = df['Credentials of the Provider'].str.replace('.', '')
-print(df['Credentials of the Provider'].value_counts())
 
 df['Credentials of the Provider']= df['Credentials of the Provider'].fillna(df['Credentials of the Provider'].mode()[0])
 
@@ -50,5 +49,3 @@ print(f"Number of duplicate rows: {duplicates}")
 df['Zip Code of the Provider'] = df['Zip Code of the Provider'].astype(str)
 print(df.dtypes)
 df.to_csv('Cleaned_HealthCare.csv', index= False)
-
-
