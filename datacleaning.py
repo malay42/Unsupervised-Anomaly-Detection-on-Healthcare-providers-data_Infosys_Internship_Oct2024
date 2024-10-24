@@ -31,19 +31,19 @@ print(df[['Number of Services', 'Number of Medicare Beneficiaries']].head())
 df['National Provider Identifier'] = df['National Provider Identifier'].astype(str)
 df['Number of Services'] = df['Number of Services'].astype(int)
 df['Number of Medicare Beneficiaries'] =df['Number of Medicare Beneficiaries'].astype(int)
-
 # %%
 print(df.info())
-
 # %%
 df.to_csv('Healthcare Providers.csv', index=False)
-
-
-
-
 # %%
 df['Average Submitted Charge Amount'] = pd.to_numeric(df['Average Submitted Charge Amount'], errors='coerce')
 df = df.dropna(subset=['Average Submitted Charge Amount'])
+
+
+
+
+
+
 
 
 
