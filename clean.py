@@ -6,7 +6,10 @@ df = pd.read_csv("Healthcare.csv")
 print(df.dtypes)
 print(' ')
 
-cols = ['Number of Services', 'Number of Medicare Beneficiaries', 'Number of Distinct Medicare Beneficiary/Per Day Services', 'Average Medicare Allowed Amount', 'Average Submitted Charge Amount', 'Average Medicare Payment Amount', 'Average Medicare Standardized Amount']
+cols = ['Number of Services', 'Number of Medicare Beneficiaries', 
+        'Number of Distinct Medicare Beneficiary/Per Day Services', 
+        'Average Medicare Allowed Amount', 'Average Submitted Charge Amount', 
+        'Average Medicare Payment Amount', 'Average Medicare Standardized Amount']
 
 for col in cols:
     df[col] = df[col].replace(',', '', regex= True)
@@ -48,4 +51,5 @@ duplicates = df.duplicated().sum()
 print(f"Number of duplicate rows: {duplicates}")
 df['Zip Code of the Provider'] = df['Zip Code of the Provider'].astype(str)
 print(df.dtypes)
+
 df.to_csv('Cleaned_HealthCare.csv', index= False)
