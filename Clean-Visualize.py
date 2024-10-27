@@ -40,7 +40,7 @@ def clean_column(col):
 df[numeric_columns] = df[numeric_columns].apply(clean_column)
 
 print(df.dtypes)
-#df.to_csv('Cleaned_Healthcare Providers.csv', index= False)
+df.to_csv('Cleaned_Healthcare Providers.csv', index= False)
 
 
 # Selecting categorical columns (object and category types)
