@@ -3,8 +3,6 @@
 # focusing on handling missing values, removing duplicates, and preparing the data for analysis.
 
 import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 # Load dataset
 df = pd.read_csv("C:\\Users\\malla\\Downloads\\archive\\Healthcare Providers.csv")
