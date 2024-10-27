@@ -7,29 +7,27 @@ df = pd.read_csv("C:\\Users\\malla\\Downloads\\archive\\Healthcare Providers.csv
 
 # Convert numeric columns to float
 numeric_columns = [
-    'Number of Services', 'Number of Medicare Beneficiaries',
-    'Number of Distinct Medicare Beneficiary/Per Day Services',
-    'Average Medicare Allowed Amount', 'Average Submitted Charge Amount',
-    'Average Medicare Payment Amount', 'Average Medicare Standardized Amount'
+'Number of Services', 'Number of Medicare Beneficiaries',
+'Number of Distinct Medicare Beneficiary/Per Day Services',
+'Average Medicare Allowed Amount', 'Average Submitted Charge Amount',
+'Average Medicare Payment Amount', 'Average Medicare Standardized Amount'
 ]
 
 # Convert columns to numeric
 for col in numeric_columns:
-    df[col] = pd.to_numeric(df[col].str.replace(',', ''), errors='coerce')
+df[col] = pd.to_numeric(df[col].str.replace(',', ''), errors='coerce')
 
 # Define the overall color palette
 sns.set_palette("Set2")
 
-
 # Bivariate Analysis
-
 
 # Heatmap with enhanced color and layout
 plt.figure(figsize=(12, 10))
 correlation_matrix = df[numeric_columns].corr()
 sns.heatmap(
-    correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f',
-    cbar_kws={'shrink': .8}, square=True, linewidths=.5
+correlation_matrix, annot=True, cmap='coolwarm', fmt='.2f',
+cbar_kws={'shrink': .8}, square=True, linewidths=.5
 )
 plt.title('Correlation Heatmap of Numeric Columns', fontsize=16)
 plt.xticks(rotation=45)
@@ -46,8 +44,8 @@ plt.show()
 # Scatter plot of Average Medicare Payment Amount vs. Number of Services with trend line
 plt.figure(figsize=(10, 6))
 sns.regplot(
-    data=df, x='Average Medicare Payment Amount', y='Number of Services',
-    scatter_kws={'alpha': 0.6}, line_kws={'color': 'red'}
+data=df, x='Average Medicare Payment Amount', y='Number of Services',
+scatter_kws={'alpha': 0.6}, line_kws={'color': 'red'}
 )
 plt.title('Average Medicare Payment Amount vs. Number of Services', fontsize=16)
 plt.xlabel('Average Medicare Payment Amount')
@@ -65,19 +63,19 @@ plt.show()
 
 # Enhanced Histograms for each numeric column
 for col in numeric_columns:
-    plt.figure(figsize=(10, 6))
-    sns.histplot(df[col], kde=True, bins=30, color='skyblue')
-    plt.title(f'Distribution of {col}', fontsize=14)
-    plt.xlabel(col)
-    plt.ylabel('Frequency')
-    plt.show()
+plt.figure(figsize=(10, 6))
+sns.histplot(df[col], kde=True, bins=30, color='skyblue')
+plt.title(f'Distribution of {col}', fontsize=14)
+plt.xlabel(col)
+plt.ylabel('Frequency')
+plt.show()
 
 # Enhanced Boxplots for each numeric column
 plt.figure(figsize=(14, 10))
 for i, col in enumerate(numeric_columns, 1):
-    plt.subplot(3, 3, i)
-    sns.boxplot(data=df, x=col, color="lightblue")
-    plt.title(f'Boxplot of {col}', fontsize=12)
+plt.subplot(3, 3, i)
+sns.boxplot(data=df, x=col, color="lightblue")
+plt.title(f'Boxplot of {col}', fontsize=12)
 plt.tight_layout()
 plt.show()
 
