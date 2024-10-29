@@ -98,7 +98,7 @@ print(df11.head())
 
 boolean_columns = df11.select_dtypes(include='bool').columns
 
-# Step 2: Convert boolean columns to integers (0 and 1)
+# Convert boolean columns to integers (0 and 1)
 df11[boolean_columns] = df11[boolean_columns].astype(int)
 
 # Normalization using MinMaxScaler
