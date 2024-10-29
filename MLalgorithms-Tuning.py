@@ -10,7 +10,7 @@ from sklearn.neighbors import KNeighborsClassifier
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Generate synthetic data (replace this with your actual dataset)
+# Generate synthetic data 
 np.random.seed(0)
 df = pd.read_csv("Cleaned_Healthcare Providers.csv")  # Replace with your file path
 numerical_columns = ['Number of Services', 'Number of Medicare Beneficiaries', 
@@ -20,7 +20,7 @@ numerical_columns = ['Number of Services', 'Number of Medicare Beneficiaries',
 
 data = df[numerical_columns].copy()
 
-# Anomaly detection using IQR method
+# Using IQR method
 Q1 = data.quantile(0.25)
 Q3 = data.quantile(0.75)
 IQR = Q3 - Q1
