@@ -12,7 +12,7 @@ import seaborn as sns
 
 # Generate synthetic data 
 np.random.seed(0)
-df = pd.read_csv("Cleaned_Healthcare Providers.csv")  # Replace with your file path
+df = pd.read_csv("Cleaned_Healthcare Providers.csv")
 numerical_columns = ['Number of Services', 'Number of Medicare Beneficiaries', 
                      'Number of Distinct Medicare Beneficiary/Per Day Services',
                      'Average Medicare Allowed Amount', 'Average Submitted Charge Amount', 
