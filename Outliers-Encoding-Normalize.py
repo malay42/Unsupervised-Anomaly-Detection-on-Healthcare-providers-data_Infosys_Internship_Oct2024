@@ -102,3 +102,5 @@ cols = ['Number of Services', 'Number of Medicare Beneficiaries',
         'Average Medicare Payment Amount', 'Average Medicare Standardized Amount']
 df_copy[cols] = (df_copy[cols] - df_copy[cols].min())/(df_copy[cols].max() - df_copy[cols].min())
 df_copy[cols] = df_copy[cols].round(4)
+
+df_copy.to_csv('Updated_HealthCare.csv', index= False)
