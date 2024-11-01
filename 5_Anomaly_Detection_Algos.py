@@ -115,3 +115,128 @@ axes[3, 1].set_title("DBSCAN (PCA)")
 
 plt.tight_layout(rect=[0, 0, 1, 0.96])
 plt.show()
+
+# Count anomalies for each detection method
+iso_anomalies = np.sum(iso_labels == -1)
+svm_anomalies = np.sum(svm_labels == -1)
+lof_anomalies = np.sum(lof_labels == -1)
+dbscan_anomalies = np.sum(dbscan_labels == -1)
+
+# Print anomaly counts
+print(f"Total Anomalies Detected by Isolation Forest: {iso_anomalies}")
+print(f"Total Anomalies Detected by One-Class SVM: {svm_anomalies}")
+print(f"Total Anomalies Detected by Local Outlier Factor: {lof_anomalies}")
+print(f"Total Anomalies Detected by DBSCAN: {np.sum(dbscan_labels == -1)}")
+# Perform anomaly detection on the entire dataset
+iso_labels_full = iso_forest.fit_predict(scaled_df)
+svm_labels_full = svm_model.fit_predict(scaled_df)
+lof_labels_full = lof.fit_predict(scaled_df)
+dbscan_labels_full = dbscan.fit_predict(scaled_df)
+
+# Count anomalies for each detection method on the full dataset
+iso_anomalies_full = np.sum(iso_labels_full == -1)
+svm_anomalies_full = np.sum(svm_labels_full == -1)
+lof_anomalies_full = np.sum(lof_labels_full == -1)
+dbscan_anomalies_full = np.sum(dbscan_labels_full == -1)
+
+# Print anomaly counts for the full dataset
+print(f"Total Anomalies Detected by Isolation Forest (Full Dataset): {iso_anomalies_full}")
+print(f"Total Anomalies Detected by One-Class SVM (Full Dataset): {svm_anomalies_full}")
+print(f"Total Anomalies Detected by Local Outlier Factor (Full Dataset): {lof_anomalies_full}")
+print(f"Total Anomalies Detected by DBSCAN (Full Dataset): {dbscan_anomalies_full}")
+
+import matplotlib.pyplot as plt
+
+# Collect anomaly counts for both sampled data and full dataset
+anomaly_counts = {
+    "Method": ["Isolation Forest", "One-Class SVM", "Local Outlier Factor", "DBSCAN"],
+    "Sampled Data": [iso_anomalies, svm_anomalies, lof_anomalies, dbscan_anomalies],
+    "Full Dataset": [iso_anomalies_full, svm_anomalies_full, lof_anomalies_full, dbscan_anomalies_full]
+}
+
+# Convert to DataFrame for easier plotting
+anomaly_df = pd.DataFrame(anomaly_counts)
+
+# Plotting
+fig, ax = plt.subplots(figsize=(10, 6))
+width = 0.35  # Width of the bars
+
+# Plot bars for sampled data and full dataset
+ax.bar(anomaly_df["Method"], anomaly_df["Sampled Data"], width, label="Sampled Data", color="skyblue")
+ax.bar(anomaly_df["Method"], anomaly_df["Full Dataset"], width, bottom=anomaly_df["Sampled Data"], label="Full Dataset", color="salmon")
+
+# Adding labels
+ax.set_xlabel("Anomaly Detection Method")
+ax.set_ylabel("Number of Anomalies Detected")
+ax.set_title("Comparison of Anomalies Detected by Each Method (Sampled vs Full Dataset)")
+ax.legend()
+
+# Display the plot
+plt.xticks(rotation=45)
+plt.show()
+
+import time
+from sklearn.metrics import pairwise_distances
+
+import time
+
+# Data to store timing and scores for plotting
+anomaly_counts_sampled = []
+anomaly_counts_full = []
+timings_sampled = []
+timings_full = []
+scores_sampled = []
+scores_full = []
+
+# Helper function for anomaly detection
+def run_anomaly_detection(model, data, label, scores_list, counts_list, timings_list):
+    start_time = time.time()
+    labels = model.fit_predict(data)
+    end_time = time.time()
+
+    # Calculate outlier scores if available (e.g., for models that have decision_function or negative_outlier_factor_)
+    if hasattr(model, 'decision_function'):
+        scores = model.decision_function(data)
+    elif hasattr(model, 'negative_outlier_factor_'):
+        scores = -model.negative_outlier_factor_
+    else:
+        scores = np.nan * np.ones(len(data))  # Use NaN for models without scoring support, such as DBSCAN
+
+    scores_list.append(scores)
+    counts_list.append(np.sum(labels == -1))
+    timings_list.append(end_time - start_time)
+    print(f"{label} - Anomalies Detected: {np.sum(labels == -1)}, Time Taken: {end_time - start_time:.2f} seconds")
+
+# Run anomaly detection on sampled data
+print("Running on Sampled Data:")
+run_anomaly_detection(iso_forest, scaled_sampled_df, "Isolation Forest", scores_sampled, anomaly_counts_sampled, timings_sampled)
+run_anomaly_detection(svm_model, scaled_sampled_df, "One-Class SVM", scores_sampled, anomaly_counts_sampled, timings_sampled)
+run_anomaly_detection(lof, scaled_sampled_df, "Local Outlier Factor", scores_sampled, anomaly_counts_sampled, timings_sampled)
+run_anomaly_detection(dbscan, scaled_sampled_df, "DBSCAN", scores_sampled, anomaly_counts_sampled, timings_sampled)
+
+# Run anomaly detection on full dataset
+print("\nRunning on Full Dataset:")
+run_anomaly_detection(iso_forest, scaled_df, "Isolation Forest", scores_full, anomaly_counts_full, timings_full)
+run_anomaly_detection(svm_model, scaled_df, "One-Class SVM", scores_full, anomaly_counts_full, timings_full)
+run_anomaly_detection(lof, scaled_df, "Local Outlier Factor", scores_full, anomaly_counts_full, timings_full)
+run_anomaly_detection(dbscan, scaled_df, "DBSCAN", scores_full, anomaly_counts_full, timings_full)
+
+# Plotting the number of anomalies and timing comparison
+fig, axes = plt.subplots(1, 2, figsize=(15, 6))
+
+# Plotting the number of anomalies detected
+axes[0].bar(anomaly_df["Method"], anomaly_counts_sampled, width=0.4, label="Sampled Data", color="skyblue")
+axes[0].bar(anomaly_df["Method"], anomaly_counts_full, width=0.4, bottom=anomaly_counts_sampled, label="Full Dataset", color="salmon")
+axes[0].set_title("Number of Anomalies Detected by Each Method")
+axes[0].set_ylabel("Number of Anomalies")
+axes[0].legend()
+
+# Plotting execution timing
+axes[1].bar(anomaly_df["Method"], timings_sampled, width=0.4, label="Sampled Data", color="skyblue")
+axes[1].bar(anomaly_df["Method"], timings_full, width=0.4, bottom=timings_sampled, label="Full Dataset", color="salmon")
+axes[1].set_title("Execution Time for Each Method")
+axes[1].set_ylabel("Execution Time (seconds)")
+axes[1].legend()
+
+plt.suptitle("Comparison of Anomaly Detection Methods (Anomalies and Timing)")
+plt.show()
