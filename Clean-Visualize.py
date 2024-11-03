@@ -50,17 +50,35 @@ print(categorical_columns)
 # Univariate analysis
 # Set the style for the plots
 sns.set(style='whitegrid')
-# Create histograms for all specified features
-for col in numeric_columns:
-    plt.figure(figsize=(10, 6))
+# Set up the figure for a grid layout of boxplots
+plt.figure(figsize=(15, 10))
+# Loop through columns and create boxplots
+for i, col in enumerate(numeric_columns, 1):
+    plt.subplot(3, 3, i)
+    sns.boxplot(x=df[col])
+    plt.title(f'Boxplot - {col}')
+
+plt.tight_layout()
+plt.show()
+
+# Set up the number of rows and columns for subplots
+n_cols = 3  # Number of columns per row
+n_rows = (len(numeric_columns) + n_cols - 1) // n_cols  # Calculate number of rows
+
+# Create a single figure with subplots
+plt.figure(figsize=(18, 5 * n_rows))
+
+# Loop through each numerical column and create a subplot for its histogram
+for i, col in enumerate(numeric_columns, 1):
+    plt.subplot(n_rows, n_cols, i)
     sns.histplot(df[col], bins=30, kde=True, color='blue', stat='density')
     plt.title(f'Histogram of {col}')
     plt.xlabel(col)
     plt.ylabel('Density')
-    plt.axvline(df[col].mean(), color='red', linestyle='dashed', linewidth=1, label='Mean')
-    plt.axvline(df[col].median(), color='green', linestyle='dashed', linewidth=1, label='Median')
-    plt.legend()
-    plt.show()
+
+# Add extra space between rows and columns
+plt.subplots_adjust(hspace=0.6, wspace=0.3)
+plt.show()
 
 #Bivariate analysis
 sns.set(style='whitegrid')
@@ -82,6 +100,6 @@ corr = df[['Number of Services', 'Number of Medicare Beneficiaries',
              'Average Medicare Allowed Amount', 'Average Submitted Charge Amount', 
              'Average Medicare Payment Amount', 'Average Medicare Standardized Amount']].corr()
 
-sns.heatmap(corr, annot=True, cmap='coolwarm', linewidths=0.5)
+sns.heatmap(corr, annot=True,fmt=".2f", cmap='coolwarm', linewidths=0.5,square=True,cbar_kws={"shrink": .8})
 plt.title('Correlation Heatmap')
 plt.show()
