@@ -117,4 +117,4 @@ df11[numerical_columns] = standard_scaler.fit_transform(df11[numerical_columns])
 print("\nDataFrame after standardization:")
 print(df11.head())
 
-df11.to_csv('Transformed_Data.csv', index= False)
+#df11.to_csv('Transformed_Data.csv', index= False)
