@@ -1,3 +1,6 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  # Show only errors
+os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -6,26 +9,30 @@ from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.losses import MeanSquaredLogarithmicError
 from tensorflow.keras.optimizers import Adam
 from sklearn.preprocessing import StandardScaler
+from sklearn.ensemble import IsolationForest
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, roc_curve, auc
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split
 
 # Load data
 df = pd.read_csv("Cleaned_Healthcare Providers.csv")
-columns = ["Number of Services", 
-           "Number of Medicare Beneficiaries",
-           "Number of Distinct Medicare Beneficiary/Per Day Services",
-           "Average Medicare Allowed Amount",
-           "Average Submitted Charge Amount",
-           "Average Medicare Payment Amount",
-           "Average Medicare Standardized Amount"]
+columns = [
+    "Number of Services", 
+    "Number of Medicare Beneficiaries",
+    "Number of Distinct Medicare Beneficiary/Per Day Services",
+    "Average Medicare Allowed Amount",
+    "Average Submitted Charge Amount",
+    "Average Medicare Payment Amount",
+    "Average Medicare Standardized Amount"
+]
 df = df[columns]
 
 # Data scaling using StandardScaler
 scaler = StandardScaler()
 x_scaled = scaler.fit_transform(df)
 
-# Train-test split for the model (since it's unsupervised, we just use it for validation later)
+# Train-test split for the model
 x_train, x_test = train_test_split(x_scaled, test_size=0.2, random_state=42)
 
 # Define Autoencoder Model
@@ -66,6 +73,7 @@ model.compile(loss=MeanSquaredLogarithmicError(), optimizer=Adam())
 
 # Train the model
 history = model.fit(x_train, x_train, epochs=20, batch_size=32, validation_data=(x_test, x_test))
+
 # Function to find threshold
 def find_threshold(model, data):
     reconstructions = model.predict(data)
@@ -89,15 +97,54 @@ def get_predictions(model, data, threshold):
 train_predictions, train_errors = get_predictions(model, x_train, threshold)
 test_predictions, test_errors = get_predictions(model, x_test, threshold)
 
-# Count anomalies in the entire dataset
-num_train_anomalies = train_predictions.value_counts().get(0, 0)
-num_test_anomalies = test_predictions.value_counts().get(0, 0)
-total_anomalies = num_train_anomalies + num_test_anomalies
-print(f"Number of Anomalies in Training Set: {num_train_anomalies}")
-print(f"Number of Anomalies in Test Set: {num_test_anomalies}")
-print(f"Total Anomalies Detected: {total_anomalies}")
+# Train Isolation Forest on training data
+iso_forest = IsolationForest(contamination=0.05, random_state=42)
+iso_forest.fit(x_train)
 
-# Visualize the reconstruction errors
+# Predict anomalies on the test set using Isolation Forest
+iso_forest_test_labels = iso_forest.predict(x_test)
+iso_forest_test_labels = np.where(iso_forest_test_labels == -1, 0, 1)  # Convert -1 to 0 for anomalies, 1 for normal
+
+# Evaluation metrics
+accuracy = accuracy_score(iso_forest_test_labels, test_predictions)
+precision = precision_score(iso_forest_test_labels, test_predictions)
+recall = recall_score(iso_forest_test_labels, test_predictions)
+f1 = f1_score(iso_forest_test_labels, test_predictions)
+
+print("Evaluation Metrics for Autoencoder on Test Set (with Isolation Forest Labels as Ground Truth):")
+print(f"Accuracy: {accuracy:.4f}")
+print(f"Precision: {precision:.4f}")
+print(f"Recall: {recall:.4f}")
+print(f"F1 Score: {f1:.4f}")
+
+# Confusion Matrix
+conf_matrix = confusion_matrix(iso_forest_test_labels, test_predictions)
+print("Confusion Matrix:")
+print(conf_matrix)
+
+# Confusion Matrix
+conf_matrix = confusion_matrix(iso_forest_test_labels, test_predictions)
+plt.figure(figsize=(6,6))
+sns.heatmap(conf_matrix, annot=True, fmt="d", cmap="Blues", xticklabels=['Anomaly', 'Normal'], yticklabels=['Anomaly', 'Normal'])
+plt.title("Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.show()
+
+# ROC Curve and AUC
+fpr, tpr, _ = roc_curve(iso_forest_test_labels, test_errors)
+roc_auc = auc(fpr, tpr)
+
+plt.figure(figsize=(10, 6))
+plt.plot(fpr, tpr, color='blue', lw=2, label=f'ROC curve (area = {roc_auc:.2f})')
+plt.plot([0, 1], [0, 1], color='gray', linestyle='--')
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("Receiver Operating Characteristic (ROC) Curve")
+plt.legend(loc="lower right")
+plt.show()
+
+# Visualize reconstruction errors
 plt.figure(figsize=(10,6))
 plt.hist(train_reconstruction_errors, bins=50, color='blue', alpha=0.7)
 plt.axvline(threshold, color='red', linestyle='--')
@@ -106,15 +153,8 @@ plt.xlabel("Reconstruction Error")
 plt.ylabel("Frequency")
 plt.show()
 
-# Visualize the anomaly predictions for training set
-plt.figure(figsize=(10,6))
-sns.scatterplot(x=np.arange(len(train_errors)), y=train_errors, color=['red' if anomaly else 'blue' for anomaly in train_predictions])
-plt.title("Anomaly Detection Using Reconstruction Errors (Training Set)")
-plt.xlabel("Index")
-plt.ylabel("Reconstruction Error")
-plt.show()
-
-## plt.figure(figsize=(10, 6))
+# Training and validation loss over epochs
+plt.figure(figsize=(10, 6))
 plt.plot(history.history['loss'], label='Training Loss')
 plt.plot(history.history['val_loss'], label='Validation Loss')
 plt.title("Training and Validation Loss Over Epochs")
@@ -123,12 +163,10 @@ plt.ylabel("Loss")
 plt.legend()
 plt.show()
 
-
-# Calculate Cumulative Distribution Function (CDF) for reconstruction errors
+# Cumulative Distribution Function (CDF) for reconstruction errors
 sorted_errors = np.sort(train_reconstruction_errors)
 cdf = np.arange(1, len(sorted_errors) + 1) / len(sorted_errors)
 
-# Plot CDF with threshold line
 plt.figure(figsize=(10, 6))
 plt.plot(sorted_errors, cdf, label="CDF of Reconstruction Errors")
 plt.axvline(threshold, color='red', linestyle='--', label="Anomaly Threshold")
@@ -138,18 +176,29 @@ plt.ylabel("Cumulative Probability")
 plt.legend()
 plt.show()
 
-# Count normal and anomalous data points
+# Count of Normal and Anomalous data points for bar chart
 normal_count = train_predictions.value_counts().get(1, 0)  # Normal data points (1)
 anomaly_count = train_predictions.value_counts().get(0, 0)  # Anomalous data points (0)
 
-# Data for the bar chart
-categories = ['Normal', 'Anomaly']
-counts = [normal_count, anomaly_count]
-
-# Create the bar chart
+# Bar chart
 plt.figure(figsize=(8, 6))
-plt.bar(categories, counts, color=['blue', 'red'])
+plt.bar(['Normal', 'Anomaly'], [normal_count, anomaly_count], color=['blue', 'red'])
 plt.title('Count of Normal vs Anomalous Data Points')
 plt.xlabel('Category')
 plt.ylabel('Count')
+plt.show()
+
+## KDE for feature distribution for all 7 columns
+plt.figure(figsize=(14, 10))
+for i, column in enumerate(columns, 1):  # Iterate over all columns
+    plt.subplot(3, 3, i)  # Create subplots in a 3x3 grid (9 positions, so it fits all columns)
+    
+    # Ensure we're using the correct test predictions for filtering
+    sns.kdeplot(df[column].iloc[:len(test_predictions)][test_predictions == 0], label="Normal", fill=True, color="blue", alpha=0.3)
+    sns.kdeplot(df[column].iloc[:len(test_predictions)][test_predictions == 1], label="Anomaly", fill=True, color="red", alpha=0.3)
+    
+    plt.title(f"Distribution of {column}")
+    plt.legend()
+
+plt.tight_layout()  # Adjust layout for better spacing
 plt.show()
