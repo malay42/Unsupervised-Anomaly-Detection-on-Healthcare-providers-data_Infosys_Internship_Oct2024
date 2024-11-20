@@ -42,8 +42,8 @@ def plot_tsne(features, anomalies, dimensions=2):
     """Plots t-SNE scatter plot for anomalies and normal data."""
     embedded_features = TSNE(n_components=dimensions, random_state=42).fit_transform(features)
     plt.figure(figsize=(8, 8))
-    plt.scatter(*zip(*embedded_features[anomalies == 1]), marker="o", c="r", s=2, alpha=0.7, label="Anomaly")
-    plt.scatter(*zip(*embedded_features[anomalies == 0]), marker="o", c="g", s=2, alpha=0.3, label="Normal")
+    plt.scatter(*zip(*embedded_features[anomalies == 1]), c="r", s=2, alpha=0.7, label="Anomaly")
+    plt.scatter(*zip(*embedded_features[anomalies == 0]), c="g", s=2, alpha=0.3, label="Normal")
     plt.legend(loc="best")
     plt.savefig("tsne_scatter.png")
     plt.show()
@@ -76,28 +76,17 @@ X_test = pipeline.transform(X_test)
 
 # Build and compile the autoencoder model
 input_dim = X_train.shape[1]
-
 model = Sequential([
-    Dense(60, activation='relu', input_shape=(input_dim,), kernel_regularizer=l2(0.01)),
+    Dense(60, activation="relu", input_shape=(input_dim,), kernel_regularizer=l2(0.01)),
     Dropout(0.1),
-    Dense(15, activation='relu', kernel_regularizer=l2(0.01)),
+    Dense(15, activation="relu", kernel_regularizer=l2(0.01)),
     Dropout(0.1),
-    Dense(10, activation='relu', kernel_regularizer=l2(0.01)),
-    Dropout(0.1),
-    Dense(6, activation='relu', kernel_regularizer=l2(0.01)),    
+    Dense(10, activation="relu", kernel_regularizer=l2(0.01)),
     BatchNormalization(),
-    Dense(2, activation='relu', kernel_regularizer=l1(0.005)),   
-    Dense(2, activation='relu', kernel_regularizer=l1(0.005)),
+    Dense(2, activation="relu", kernel_regularizer=l1(0.005)),
     Dropout(0.1),
-    Dense(6, activation='relu', kernel_regularizer=l2(0.01)),
-    Dropout(0.1),
-    Dense(10, activation='relu', kernel_regularizer=l2(0.01)),
-    Dropout(0.1),
-    Dense(15, activation='relu', kernel_regularizer=l2(0.01)),
-    Dropout(0.1),
-    Dense(60, activation='relu', kernel_regularizer=l2(0.01)),
-    Dropout(0.1),
-    Dense(input_dim, activation='relu', kernel_regularizer=l2(0.01))
+    Dense(10, activation="relu", kernel_regularizer=l2(0.01)),
+    Dense(input_dim, activation="relu", kernel_regularizer=l2(0.01)),
 ])
 
 model.compile(optimizer="adam", loss="mse")
@@ -135,11 +124,9 @@ def print_metrics(y_true, y_pred):
     print(f"Precision: {precision:.4f}, Recall: {recall:.4f}, F1-Score: {f1:.4f}")
     print("\nClassification Report:\n", classification_report(y_true, y_pred))
 
-
 print_metrics(y_test, predicted_anomalies)
 
-
-# Detect anomalies for entire dataset
+# Evaluate performance for entire dataset
 X = df.drop('anomaly', axis=1)
 X_transformed = pipeline.transform(X)
 pred = model.predict(X_transformed)
@@ -163,7 +150,7 @@ plt.ylabel("Frequency")
 plt.legend()
 plt.title("Reconstruction Error Distribution with Anomaly Threshold")
 
-# Distribution of reconstruction errors for anomalous and normal data as separate
+# distribution of reconstruction errors for anomalous and normal data as separate
 clean_errors = reconstruction_error[df['anomaly'] == 0]
 anomaly_errors = reconstruction_error[df['anomaly'] == 1]
 fig, ax = plt.subplots(figsize=(6, 6))
@@ -176,12 +163,14 @@ plt.show()
 
 # Define numerical columns for visualization
 df['ae_anomaly'] = ae_anomaly
+
 num_columns = [
     'Number of Services', 'Number of Medicare Beneficiaries',
     'Number of Distinct Medicare Beneficiary/Per Day Services',
     'Average Medicare Allowed Amount', 'Average Submitted Charge Amount',
     'Average Medicare Payment Amount', 'Average Medicare Standardized Amount'
 ]
+
 plt.figure(figsize=(12, 10))
 for i, column in enumerate(num_columns, 1):
     plt.subplot(4, 2, i)
