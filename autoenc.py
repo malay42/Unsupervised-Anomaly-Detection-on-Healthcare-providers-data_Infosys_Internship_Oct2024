@@ -37,7 +37,6 @@ print(df["anomaly"].value_counts())
 # Prepare features and labels
 features, anomalies = df.drop("anomaly", axis=1).values, df["anomaly"].values
 
-
 def plot_tsne(features, anomalies, dimensions=2):
     """Plots t-SNE scatter plot for anomalies and normal data."""
     embedded_features = TSNE(n_components=dimensions, random_state=42).fit_transform(features)
@@ -47,7 +46,6 @@ def plot_tsne(features, anomalies, dimensions=2):
     plt.legend(loc="best")
     plt.savefig("tsne_scatter.png")
     plt.show()
-
 
 plot_tsne(features, anomalies)
 
