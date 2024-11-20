@@ -165,7 +165,7 @@ plt.ylabel("Frequency")
 plt.legend()
 plt.title("Reconstruction Error Distribution with Anomaly Threshold")
 
-# distribution of reconstruction errors for anomalous and normal data as separate
+# Distribution of reconstruction errors for anomalous and normal data as separate
 clean_errors = reconstruction_error[df['anomaly'] == 0]
 anomaly_errors = reconstruction_error[df['anomaly'] == 1]
 fig, ax = plt.subplots(figsize=(6, 6))
@@ -175,7 +175,6 @@ plt.axvline(threshold, color='black', linestyle='dashed', linewidth=2, label="An
 plt.title("(Normalized) Distribution of the Reconstruction Loss")
 plt.legend()
 plt.show()
-
 
 # Define numerical columns for visualization
 df['ae_anomaly'] = ae_anomaly
