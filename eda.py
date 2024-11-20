@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
 
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import LocalOutlierFactor
+
 # Loading the Data
 df = pd.read_csv('Healthcare Providers.csv')
 df.head()
@@ -115,9 +118,6 @@ plt.tight_layout()
 plt.show()
 
 # Outlier Detection Methods: LOF (Local Outlier Factor)
-from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import LocalOutlierFactor
-
 scaler = StandardScaler()
 df3_scaled = scaler.fit_transform(df3[num_cols])
 lof = LocalOutlierFactor(n_neighbors=50)
