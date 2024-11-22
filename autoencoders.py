@@ -10,7 +10,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense, Dropout
 from tensorflow.keras.optimizers import Adam
-
+from sklearn.model_selection import train_test_split
 # Load the dataset
 file_path = "C:/Users/shiva/Desktop/project/Cleaned_Healthcare_Providers.csv"
 df = pd.read_csv(file_path)
@@ -38,6 +38,7 @@ pca = PCA(n_components=2)
 pca_features = pca.fit_transform(df_poly)
 df_pca = pd.DataFrame(pca_features, columns=['PCA1', 'PCA2'])
 
+#below is training and validation 
 # Prepare the dataset for the autoencoder
 X = df[numeric_columns].values
 
@@ -134,9 +135,6 @@ def save_anomalies_to_csv(anomalies_df, csv_path="anomalies_report.csv"):
 
 save_anomalies_to_csv(anomalies)
 
-import pandas as pd
-import numpy as np
-
 # Function to detect if a given row is an anomaly
 def detect_anomaly_in_row(row, scaler, autoencoder, best_threshold):
     # Select numeric columns for the row, matching the model's input format
@@ -168,4 +166,82 @@ is_anomaly, row_error = detect_anomaly_in_row(random_row, scaler, autoencoder, b
 
 print(f"Row index {random_row_index} - Reconstruction Error: {row_error:.4f}")
 print("Anomaly" if is_anomaly else "Normal")
- 
+
+#below is training and testing 
+
+# Split the data into training and testing sets
+train_size = 0.8  # 80% for training, 20% for testing
+X_train, X_test = train_test_split(X, test_size=1 - train_size, random_state=42)
+
+print(f"Training Data: {len(X_train)} samples ({train_size * 100:.1f}%)")
+print(f"Testing Data: {len(X_test)} samples ({(1 - train_size) * 100:.1f}%)")
+
+# Train the autoencoder
+history = autoencoder.fit(
+    X_train, X_train,
+    epochs=20,
+    batch_size=32,
+    shuffle=True,
+    validation_data=(X_test, X_test),
+    verbose=1
+)
+
+# Plot training and validation loss
+plt.figure(figsize=(8, 5))
+plt.plot(history.history['loss'], label='Training Loss')
+plt.plot(history.history['val_loss'], label='Validation Loss')
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.title('Training vs Validation Loss')
+plt.legend()
+plt.grid()
+plt.show()
+
+# Predict and calculate reconstruction error for testing data
+X_test_pred = autoencoder.predict(X_test)
+reconstruction_error_test = np.mean(np.square(X_test - X_test_pred), axis=1)
+
+# Define the best threshold for anomaly detection
+best_threshold = np.percentile(reconstruction_error_test, 95)  # Example threshold
+
+# Detect anomalies in the testing data
+test_predicted_anomalies = (reconstruction_error_test > best_threshold).astype(int)
+
+# Perform PCA on the testing data
+pca = PCA(n_components=2)
+pca_test_features = pca.fit_transform(X_test)
+
+# Create a DataFrame for PCA results with anomaly labels
+df_pca_test = pd.DataFrame(pca_test_features, columns=['PCA1', 'PCA2'])
+df_pca_test['Anomaly'] = test_predicted_anomalies
+
+# Separate clean and fraud data for plotting
+clean_data = df_pca_test[df_pca_test['Anomaly'] == 0]
+fraud_data = df_pca_test[df_pca_test['Anomaly'] == 1]
+
+# Plot clean data vs fraud data
+plt.figure(figsize=(8, 6))
+plt.scatter(clean_data['PCA1'], clean_data['PCA2'], c='blue', label='Clean Data', alpha=0.5)
+plt.scatter(fraud_data['PCA1'], fraud_data['PCA2'], c='red', label='Fraud Data', alpha=0.7)
+
+plt.xlabel('PCA1')
+plt.ylabel('PCA2')
+plt.title('Clean Data vs Fraud Data (Testing Set)')
+plt.legend()
+plt.grid()
+plt.show()
+
+# Plot histogram for reconstruction errors
+clean_reconstruction_errors = reconstruction_error_test[test_predicted_anomalies == 0]
+fraud_reconstruction_errors = reconstruction_error_test[test_predicted_anomalies == 1]
+
+plt.figure(figsize=(8, 6))
+plt.hist(clean_reconstruction_errors, bins=30, color='blue', alpha=0.5, label='Clean Data')
+plt.hist(fraud_reconstruction_errors, bins=30, color='red', alpha=0.7, label='Fraud Data')
+
+plt.xlabel('Reconstruction Error')
+plt.ylabel('Frequency')
+plt.title('Histogram of Reconstruction Errors (Clean vs Fraud)')
+plt.legend()
+plt.grid()
+plt.show()
