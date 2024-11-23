@@ -11,11 +11,8 @@ df = pd.read_csv('Healthcare_Providers.csv')        # Loading dataset
 # Univariate Analysis - Numerical Columns 
 numeric_cols = ['Number of Services' ,
                 'Number of Medicare Beneficiaries' ,
-                'Number of Distinct Medicare Beneficiary/Per Day Services' ,
                 'Average Medicare Allowed Amount' ,
-                'Average Submitted Charge Amount' ,
-                'Average Medicare Payment Amount', 
-                'Average Medicare Standardized Amount']
+                'Average Submitted Charge Amount']
                 
 # Measure of Central Tendency: Mean, Median, Mode
 central_tendency = {}        # Create an empty dictionary to store the results
@@ -132,9 +129,7 @@ print("\nCovariance Matrix:\n", covariance_matrix)
 
 # Correlation Matrix and Heatmap - Displays correlation coefficients between variables in a grid for easy visualization
 numerical_cols = ['Number of Services', 'Number of Medicare Beneficiaries', 
-                  'Number of Distinct Medicare Beneficiary/Per Day Services', 
-                  'Average Medicare Allowed Amount', 'Average Submitted Charge Amount', 
-                  'Average Medicare Payment Amount', 'Average Medicare Standardized Amount']
+                  'Average Medicare Allowed Amount', 'Average Submitted Charge Amount']
 corr_matrix = df[numerical_cols].corr()
 plt.figure(figsize=(6, 4))
 sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', vmin=-1, vmax=1)

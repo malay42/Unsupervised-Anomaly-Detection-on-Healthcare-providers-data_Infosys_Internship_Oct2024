@@ -3,11 +3,6 @@ import pandas as pd
 
 df = pd.read_csv('Healthcare_Providers.csv')        # Loading dataset
 
-# Remove Duplicate entries
-df.duplicated().sum()       # Checking for duplicated rows
-df.drop_duplicates()        # Removing Duplicates
-print(f"Current shape of dataset is: {df.shape}")
-
 # Dropping Unwanted Columns 
 columns_to_drop = ['index',                                             # Irrelevant
                    'National Provider Identifier',                      # All unique values - not useful
@@ -18,7 +13,10 @@ columns_to_drop = ['index',                                             # Irrele
                    'Street Address 2 of the Provider',                  # High missing values
                    'Zip Code of the Provider',                          # 50k unique values(wont help to detect anomaly)
                    'Medicare Participation Indicator',                  # about 99.9% entries are 'yes'
-                   'Country Code of the Provider']                      # about 99.9% entries are from US (only 6 entries are from different countries)                  
+                   'HCPCS Description',                                 # HCPCS Code and description represent same thing 
+                   'Country Code of the Provider',                      # about 99.9% entries are from US (only 6 entries are from different countries)
+                   'Number of Distinct Medicare Beneficiary/Per Day Services',
+                   'Average Medicare Payment Amount', 'Average Medicare Standardized Amount']                                        
 df = df.drop(columns=columns_to_drop)
 
 # Handling Missing Values 
@@ -33,16 +31,11 @@ df["Gender of the Provider"].replace(np.nan, constant, inplace = True)
 
 print(df[null_values].isnull().sum())       # Rechecking whether null values are present
 
-
 # Converting Data Types - Categorical to Numerical
 df['Number of Services'] = df['Number of Services'].str.replace(',', '').astype(float)
 df['Number of Medicare Beneficiaries'] = df['Number of Medicare Beneficiaries'].str.replace(',', '').astype(float)
-df['Number of Distinct Medicare Beneficiary/Per Day Services'] = df['Number of Distinct Medicare Beneficiary/Per Day Services'].str.replace(',', '').astype(float)
 df['Average Medicare Allowed Amount'] = df['Average Medicare Allowed Amount'].str.replace(',', '').astype(float)
 df['Average Submitted Charge Amount'] = df['Average Submitted Charge Amount'].str.replace(',', '').astype(float)
-df['Average Medicare Payment Amount'] = df['Average Medicare Payment Amount'].str.replace(',', '').astype(float)
-df['Average Medicare Standardized Amount'] = df['Average Medicare Standardized Amount'].str.replace(',', '').astype(float)
-
 
 # Standarizing Column Values 
 obj_features = df.select_dtypes(include=["object"]).columns

@@ -6,10 +6,7 @@ import seaborn as sns
 df = pd.read_csv('Healthcare_Providers.csv')        # Loading dataset
 
 # Low Relevance Features
-numeric_columns_median = ['Average Medicare Allowed Amount',
-                'Average Medicare Standardized Amount',
-                'Number of Medicare Beneficiaries',
-                'Number of Distinct Medicare Beneficiary/Per Day Services']
+numeric_columns_median = ['Average Medicare Allowed Amount', 'Number of Medicare Beneficiaries']
 
 # Function to remove outliers and replace them with median
 def replace_outliers_with_median(df, col):
@@ -36,6 +33,4 @@ for col in numeric_columns_median:
     plt.show()
 
 # High Relevance Features - Outliers are kept as it is in this features as they may help in anomaly detection
-high_rel_feat = ['Number of Services', 
-                 'Average Submitted Charge Amount',
-                 'Average Medicare Payment Amount']
+high_rel_feat = ['Number of Services', 'Average Submitted Charge Amount' ]
