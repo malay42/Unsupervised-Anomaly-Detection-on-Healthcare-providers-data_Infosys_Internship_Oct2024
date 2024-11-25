@@ -1,4 +1,4 @@
-# Healthcare Anomaly Detection System
+# Unsupervised Healthcare Anomaly Detection System
 
 ## Table of Contents
 - [Introduction](#introduction)
