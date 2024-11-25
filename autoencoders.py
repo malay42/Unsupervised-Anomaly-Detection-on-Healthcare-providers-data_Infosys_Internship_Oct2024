@@ -180,7 +180,7 @@ def detect_anomaly_in_row(row, scaler, autoencoder, best_threshold):
     row_error = np.mean(np.square(row_data - row_pred))
     is_anomaly = row_error > best_threshold
     return is_anomaly, row_error
-
+'''
 # Test the anomaly detection function
 file_path = "C:/Users/shiva/Desktop/project/anomalies_report.csv"
 df = pd.read_csv(file_path)
@@ -190,6 +190,41 @@ is_anomaly, row_error = detect_anomaly_in_row(random_row, scaler, autoencoder, b
 
 print(f"Row index {random_row_index} - Reconstruction Error: {row_error:.4f}")
 print("Anomaly" if is_anomaly else "Normal")
+'''
+# Function to detect anomalies for a specific row number entered by the user
+def detect_anomaly_for_row(df, scaler, autoencoder, best_threshold, numeric_columns, row_number):
+    # Validate the row number
+    if row_number < 0 or row_number >= len(df):
+        raise ValueError(f"Row number {row_number} is out of range. Please enter a number between 0 and {len(df)-1}.")
+    
+    # Select the specific row
+    selected_row = df.iloc[row_number]
+    
+    # Scale the numeric features of the row
+    row_data = selected_row[numeric_columns].values.reshape(1, -1)
+    row_data_scaled = scaler.transform(row_data)
+    
+    # Predict with autoencoder and calculate reconstruction error
+    row_pred = autoencoder.predict(row_data_scaled)
+    row_error = np.mean(np.square(row_data_scaled - row_pred))
+    
+    # Determine if the row is an anomaly
+    is_anomaly = row_error > best_threshold
+    
+    return selected_row, is_anomaly, row_error
+
+# Prompt the user to enter a row number
+try:
+    row_number = int(input(f"Enter a row number (0 to {len(df)-1}) for anomaly detection: "))
+    selected_row, is_anomaly, row_error = detect_anomaly_for_row(df, scaler, autoencoder, best_threshold, numeric_columns, row_number)
+    
+    # Print results
+    print(f"\nSelected Row Number: {row_number}")
+    print(f"Selected Row Data:\n{selected_row}")
+    print(f"Reconstruction Error: {row_error:.4f}")
+    print("Anomaly Detected!" if is_anomaly else "Normal")
+except ValueError as e:
+    print(f"Error: {e}")
 
 # Visualize PCA results with anomaly labels
 X_test_pred = autoencoder.predict(X_test)
