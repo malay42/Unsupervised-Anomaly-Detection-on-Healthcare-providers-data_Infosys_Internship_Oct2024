@@ -1,0 +1,11 @@
+National Provider Identifier,Last Name/Organization Name of the Provider,Credentials of the Provider,Gender of the Provider,Entity Type of the Provider,Street Address 1 of the Provider,City of the Provider,Zip Code of the Provider,State Code of the Provider,Country Code of the Provider,Provider Type,Medicare Participation Indicator,Place of Service,HCPCS Code,HCPCS Description,HCPCS Drug Indicator,Number of Services,Number of Medicare Beneficiaries,Number of Distinct Medicare Beneficiary/Per Day Services,Average Medicare Allowed Amount,Average Submitted Charge Amount,Average Medicare Payment Amount,Average Medicare Standardized Amount
+1323725478,DOE,R.N.,1,1,101 CENTER ST,CITYD,43241.469960305825,CA,US,Type3,N,Home,G0202,Service D,N,26,95,5,651.96,1273.34,170.98,189.29
+1306395811,JOHNSON,R.N.,0,1,102 OCEAN DR,CITYB,98788.01233868193,NY,US,Type3,N,Hospital,99348,Service D,Y,40,56,15,621.86,807.29,636.53,290.79
+1424876220,MILLER,DPM,0,2,123 MAIN ST,CITYC,16103.349901809917,FL,US,Type4,N,Office,G0202,Service E,Y,16,23,30,310.69,1465.25,518.75,577.92
+1472373752,BROWN,D.O.,0,1,789 MARKET ST,CITYE,45286.15208581025,CA,US,Type1,Y,Home,96372,Service C,N,69,20,83,505.72,1370.1,866.68,202.62
+1824785238,BROWN,P.A.,1,2,102 OCEAN DR,CITYB,90077.71320806244,TX,US,Type4,Y,Clinic,G0202,Service A,N,63,60,54,268.8,641.27,377.56,119.27
+1850532014,JOHNSON,D.O.,0,1,101 CENTER ST,CITYD,69319.21236521358,TX,US,Type2,Y,Hospital,99223,Service C,N,61,45,47,518.34,929.82,345.45,242.66
+1876277706,BROWN,M.D.,1,2,123 MAIN ST,CITYE,25010.745767270695,NY,US,Type3,Y,Home,96372,Service D,Y,74,76,1,477.37,462.58,739.19,980.77
+1172024466,SMITH,DPM,1,1,101 CENTER ST,CITYA,85539.70854971236,NY,US,Type2,N,Clinic,96372,Service B,N,35,33,62,992.82,223.11,624.84,743.58
+1736548631,BROWN,DPM,0,1,123 MAIN ST,CITYC,46551.931966485376,TX,US,Type2,N,Hospital,96372,Service D,Y,95,31,6,326.2,596.97,476.7,267.09
+1598875144,JOHNSON,P.A.,0,2,789 MARKET ST,CITYD,24081.45791259491,TX,US,Type2,Y,Office,96372,Service D,Y,55,98,9,613.67,165.88,346.95,551.32

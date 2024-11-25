@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Anomaly Detection</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="/static/js/script.js" defer></script>
+</head>
+<body>
+    <!-- Dark Mode Toggle -->
+    <div class="toggle-container">
+        <span class="toggle-label">Light Mode</span>
+        <label class="switch">
+            <input type="checkbox" id="mode-toggle">
+            <span class="slider"></span>
+        </label>
+        <span class="toggle-label">Dark Mode</span>
+    </div>
+
+    <div class="container">
+        <h1>Healthcare Anomaly Detection</h1>
+
+        <!-- Form Section -->
+        <form method="POST" action="/">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Number of Services:</label>
+                    <input type="number" name="num_services" step="0.01" value="{{ request.form.get('num_services', '') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Number of Medicare Beneficiaries:</label>
+                    <input type="number" name="num_beneficiaries" step="0.01" value="{{ request.form.get('num_beneficiaries', '') }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>No. of Distinct Medicare Beneficiary / Day Services:</label>
+                    <input type="number" name="num_distinct_services" step="0.01" value="{{ request.form.get('num_distinct_services', '') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Average Medicare Allowed Amount:</label>
+                    <input type="number" name="avg_allowed_amount" step="0.01" value="{{ request.form.get('avg_allowed_amount', '') }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Average Submitted Charge Amount:</label>
+                    <input type="number" name="avg_submitted_charge" step="0.01" value="{{ request.form.get('avg_submitted_charge', '') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Average Medicare Payment Amount:</label>
+                    <input type="number" name="avg_payment" step="0.01" value="{{ request.form.get('avg_payment', '') }}" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Average Medicare Standardized Amount:</label>
+                    <input type="number" name="avg_standardized" step="0.01" value="{{ request.form.get('avg_standardized', '') }}" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Gender of the Provider:</label>
+                    <select name="gender" required>
+                        <option value="0" {% if request.form.get('gender') == '0' %}selected{% endif %}>Male</option>
+                        <option value="1" {% if request.form.get('gender') == '1' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit">Predict</button>
+        </form>
+
+        <!-- Results Section -->
+        {% if results %}
+        <div class="results">
+            <h2>Prediction Results:</h2>
+            <ul>
+                {% for result in results %}
+                <li>{{ result }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>
