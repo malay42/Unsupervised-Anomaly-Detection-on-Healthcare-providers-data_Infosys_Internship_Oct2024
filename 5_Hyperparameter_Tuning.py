@@ -18,12 +18,10 @@ def calculate_intra_cluster_variance(data, labels):
     distances = pairwise_distances(normal_data, [centroid])
     return distances.mean()
 
-
 def custom_score(estimator, X, y=None):
     """Custom scoring function: negative intra-cluster variance."""
     labels = estimator.fit_predict(X)
     return -calculate_intra_cluster_variance(X, labels) 
-
 
 def perform_grid_search(data_scaled):
     """Perform Grid Search for Isolation Forest parameters."""
@@ -47,10 +45,7 @@ def perform_grid_search(data_scaled):
                 )
                 labels = isolation_forest.fit_predict(data_scaled)
 
-                # Calculate Intra-cluster Variance
                 icv_score = calculate_intra_cluster_variance(data_scaled, labels)
-
-                # Update best parameters if ICV improves
                 if icv_score < best_icv_score:
                     best_icv_score = icv_score
                     best_params = {
@@ -60,7 +55,6 @@ def perform_grid_search(data_scaled):
                     }
 
     return best_params
-
 
 def perform_randomized_search(data, model, parameters):
     """Perform Randomized Search for Isolation Forest parameters."""
@@ -76,7 +70,6 @@ def perform_randomized_search(data, model, parameters):
     random_search_params = random_search.best_params_
     
     return random_search_params
-
 
 def perform_bayesian_search(data, model, parameters):
     """Perform Bayesian Search for Isolation Forest parameters."""
