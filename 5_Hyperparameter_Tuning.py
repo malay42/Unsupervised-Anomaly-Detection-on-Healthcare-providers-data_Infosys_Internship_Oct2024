@@ -4,7 +4,8 @@ import pandas as pd
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import IsolationForest
-from sklearn.metrics import pairwise_distances
+from sklearn.decomposition import PCA
+from sklearn.metrics import pairwise_distances, calinski_harabasz_score
 from sklearn.model_selection import RandomizedSearchCV
 from skopt import BayesSearchCV
 
@@ -23,6 +24,13 @@ def custom_score(estimator, X, y=None):
     labels = estimator.fit_predict(X)
     return -calculate_intra_cluster_variance(X, labels) 
 
+def custom_score_ch(estimator, X, y=None):
+    """Custom scoring function: Calinski-Harabasz score using PCA."""
+    labels = estimator.fit_predict(X)
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X)
+    return calinski_harabasz_score(X_pca, labels)
+
 def perform_grid_search(data_scaled):
     """Perform Grid Search for Isolation Forest parameters."""
     contamination = [0.04, 0.05, 0.06]
@@ -36,7 +44,7 @@ def perform_grid_search(data_scaled):
     for cont in contamination:
         for n_est in n_estimators:
             for max_samp in max_samples:
-                # Initialize Isolation Forest
+                
                 isolation_forest = IsolationForest(
                     contamination=cont,
                     n_estimators=n_est,
@@ -85,6 +93,12 @@ def perform_bayesian_search(data, model, parameters):
     bayesian_search_params = bayes_search.best_params_
     return bayesian_search_params
 
+def evaluate_model_ch_score(model_params, data_scaled):
+    """Function to evaluate Calinski-Harabasz score for the best models."""
+    isolation_forest = IsolationForest(**model_params, random_state=42)
+    labels = isolation_forest.fit_predict(data_scaled)
+    return custom_score_ch(isolation_forest, data_scaled)
+
 # Main Workflow
 if __name__ == "__main__":
 
@@ -112,5 +126,12 @@ if __name__ == "__main__":
     bayesian_search_params = perform_bayesian_search(data_scaled, isolation_forest, param_dist)
     print("Best Parameters from Bayesian Search:", bayesian_search_params)
 
+    # Evaluate Calinski-Harabasz score for each model
+    grid_ch_score = evaluate_model_ch_score(grid_search_params, data_scaled)
+    print(f"Calinski-Harabasz Score from Grid Search: {grid_ch_score}")
 
+    random_ch_score = evaluate_model_ch_score(random_search_params, data_scaled)
+    print(f"Calinski-Harabasz Score from Randomized Search: {random_ch_score}")
 
+    bayes_ch_score = evaluate_model_ch_score(bayesian_search_params, data_scaled)
+    print(f"Calinski-Harabasz Score from Bayesian Search: {bayes_ch_score}")
