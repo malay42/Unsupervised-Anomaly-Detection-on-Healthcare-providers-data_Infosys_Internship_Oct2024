@@ -97,5 +97,5 @@ if __name__ == "__main__":
     detect_anomalies(df, data_scaled, num_cols, svm_model, 'SVM_Anomaly', 'SVM Anomaly')
 
      # Save the labeled DataFrame to a CSV file
-    df.to_csv('labelled_data.csv', index=False)
-    print("The labeled data has been saved to 'labelled_data.csv'.")
+    df.to_csv('labeled_data.csv', index=False)
+    print("The labeled data has been saved to 'labeled_data.csv'.")
