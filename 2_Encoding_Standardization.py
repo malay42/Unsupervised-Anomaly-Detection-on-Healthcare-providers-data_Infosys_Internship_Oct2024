@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import LabelEncoder, Normalizer, MinMaxScaler
 from sklearn.pipeline import Pipeline
 
+# Function Definitions
 def load_data(file_path):
     """Load the CSV file into a DataFrame."""
     return pd.read_csv(file_path)
