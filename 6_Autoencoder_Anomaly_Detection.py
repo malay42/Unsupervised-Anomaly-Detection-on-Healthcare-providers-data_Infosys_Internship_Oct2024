@@ -14,7 +14,7 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score
 from sklearn.metrics import confusion_matrix
 from tensorflow.keras import layers, losses
 
-# Load and preprocess data
+# Function Definitions
 def load_data(file_path):
     """Load and preprocess the dataset."""
     df = pd.read_csv(file_path)
@@ -22,7 +22,6 @@ def load_data(file_path):
     df_scaled = scaler.fit_transform(df)
     return df, df_scaled
 
-# Add anomaly detection labels
 def detect_anomalies(df, contamination=0.06):
     """Apply Isolation Forest to detect anomalies."""
     iso_forest = IsolationForest(
@@ -36,14 +35,12 @@ def detect_anomalies(df, contamination=0.06):
     df['anomaly'] = df['anomaly'].map({1: 0, -1: 1})  # Map anomalies to 1
     return df
 
-# Split data into training and testing
 def split_data(df):
     """Split the dataset into training and testing sets."""
     labels = df.iloc[:, -1].values
     data = df.iloc[:, :-1].values
     return train_test_split(data, labels, test_size=0.2, random_state=21)
 
-# Apply preprocessing pipeline
 def preprocess_pipeline(train_data, test_data):
     """Apply normalization and scaling to the data."""
     pipeline = Pipeline([
@@ -53,7 +50,6 @@ def preprocess_pipeline(train_data, test_data):
     pipeline.fit(train_data)
     return pipeline.transform(train_data), pipeline.transform(test_data)
 
-# Define the autoencoder model
 class AnomalyDetector(Model):
     def __init__(self, input_dim):
         super(AnomalyDetector, self).__init__()
