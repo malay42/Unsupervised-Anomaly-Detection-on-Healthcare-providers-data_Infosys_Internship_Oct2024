@@ -1,3 +1,4 @@
+# Import libraries
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -5,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import pairwise_distances, calinski_harabasz_score
 from sklearn.decomposition import PCA
 
+# Function Definitions
 def custom_score(estimator, X):
     """Compute Calinski-Harabasz score using PCA-reduced data."""
     labels = estimator.fit_predict(X)
