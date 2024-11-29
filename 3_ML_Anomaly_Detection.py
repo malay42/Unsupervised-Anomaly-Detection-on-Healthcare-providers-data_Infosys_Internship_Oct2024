@@ -12,7 +12,7 @@ from sklearn.ensemble import IsolationForest
 from sklearn.svm import OneClassSVM
 from sklearn.manifold import TSNE
 
-
+# Function Definitions
 def plot_anomalies(df, num_cols, anomaly_col, anomaly_label):
     """Plot numerical columns with anomalies highlighted."""
     plt.figure(figsize=(18, 10))
