@@ -1,0 +1,5 @@
+flask==2.0.1
+numpy>=1.19.2
+scikit-learn>=0.24.2
+pandas>=1.2.4
+# Add your model's requirements here 
